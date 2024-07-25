@@ -2,11 +2,40 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
     <title th:text="${@environment.getProperty('aplicacion.nombre')}"></title>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container">
+        <a class="navbar-brand" href="#">Home</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page"
+                       href="#">Administrar usuarios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{|cursoListar|}" th:text="|Mantenimiento de Cursos|">
+                        Administrar cursos
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<section class="container">
     <h1 th:text="|Bienvenid@ |+${usuario.nombreCompleto}"></h1>
-    <br />
-    Pronto se mostrarán las opciones del Sistema!
+    <p>
+        Pronto se mostrarán las opciones del Sistema!
+    </p>
+</section>
+<script th:src="@{/js/bootstrap.min.js}" type="text/javascript"></script>
 </body>
 </html>
