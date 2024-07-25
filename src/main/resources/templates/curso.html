@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <title th:text="${@environment.getProperty('aplicacion.nombre')}"></title>
+    <style>
+        .navbar-brand {
+            padding: 0 2rem 0 0;
+            margin-bottom: 0.1rem;
+        }
+
+        .table-container {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+        }
+
+        .table > tbody {
+            vertical-align: middle;
+        }
+
+        .avatar {
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: #ffffff;
+        }
+
+        .status-creado {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-en-venta {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-completo {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container">
+        <a class="navbar-brand" href="#">Home</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page"
+                       href="#">Administrar usuarios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{|cursoListar|}"
+                       th:text="|Mantenimiento de Cursos|" />
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="container">
+    <h1 class="mt-5 mb-4">Mantenimiento de cursos</h1>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop">
+        Crear curso
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+         data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Datos del curso
+                        a ingresar</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form action="#" th:action="@{/cursoGrabar}" method="post"
+                          class="register-form" id="crearCurso">
+                        <div class="form-group mb-3">
+                            <input type="text" name="nomCurso"
+                                   class="form-control text-box"
+                                   placeholder="Nombre Curso" required/>
+                        </div>
+                        <div class="form-group mb-3">
+                            <input type="date" name="fechaInicio"
+                                   class="form-control text-box"
+                                   placeholder="Fecha Inicio" required/>
+                        </div>
+                        <div class="form-group mb-3">
+                            <input type="number" name="alumnosMin"
+                                   class="form-control text-box"
+                                   placeholder="Mínimo Alumnos" required/>
+                        </div>
+                        <div class="form-group mb-3">
+                            <select name="estado" class="form-select" required>
+                                <option value="0">CREADO</option>
+                                <option value="1">EN PROCESO DE VENTA</option>
+                                <option value="2">COMPLETO</option>
+                            </select>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <!--                    <a th:href="@{|cursoListar|}" th:text="|Cancelar|" class="btn btn-primary button-submit"></a>-->
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close
+                    </button>
+                    <button type="submit" form="crearCurso" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Grabar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container table-container mt-5" th:if="${lista != null}">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Fecha Inicio</th>
+                <th class="text-end">Mínimo alumnos</th>
+                <th class="text-end">Inscritos</th>
+                <th class="text-end">Estado</th>
+                <th class="text-end">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="curso, it : ${lista}">
+                <td th:text="${it.index + 1}"></td>
+                <td th:text="${curso.nomCurso}"></td>
+                <td th:text="${#dates.format(curso.fechaInicio, 'dd/MMM/yyyy')}"></td>
+                <td class="text-end" th:text="${curso.alumnosMin}"></td>
+                <td class="text-end" th:text="${curso.alumnosAct}"></td>
+                <td class="text-end">
+                    <span th:if="${curso.estado == 0}" class="status-badge status-creado">CREADO</span>
+                    <span th:if="${curso.estado == 1}" class="status-badge status-en-venta">EN PROCESO DE VENTA</span>
+                    <span th:if="${curso.estado == 2}" class="status-badge status-completo">COMPLETO</span>
+                </td>
+                <td class="text-end">
+                    <a href="#" class="text-primary me-4"><i class="fas fa-edit"></i></a>
+                    <a th:href="@{|cursoEliminar?codigo=| + ${curso.idCurso}}"
+                       class="text-danger">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<script th:src="@{/js/bootstrap.min.js}" type="text/javascript"></script>
+<!-- Font Awesome -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+</body>
+</html>
