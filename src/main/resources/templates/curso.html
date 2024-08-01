@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title th:text="${@environment.getProperty('aplicacion.nombre')}"></title>
     <style>
         .navbar-brand {
@@ -71,7 +72,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{|cursoListar|}"
-                       th:text="|Mantenimiento de Cursos|" />
+                       th:text="|Mantenimiento de Cursos|"/>
                 </li>
             </ul>
         </div>
@@ -101,25 +102,44 @@
                 </div>
                 <div class="modal-body">
 
-                    <form action="#" th:action="@{/cursoGrabar}" method="post"
+                    <form action="#" th:action="@{/cursoGrabar}" th:object="${cursoBean}"
+                          method="post"
                           class="register-form" id="crearCurso">
                         <div class="form-group mb-3">
-                            <input type="text" name="nomCurso"
+                            <input type="text" th:field="*{nomCurso}"
                                    class="form-control text-box"
-                                   placeholder="Nombre Curso" required/>
+                                   placeholder="Nombre Curso"/>
+
+                            <p th:if="${#fields.hasErrors('nomCurso')}"
+                               th:errorclass="formFieldError"
+                               class="text-danger"
+                               th:errors="*{nomCurso}"/></p>
                         </div>
+
                         <div class="form-group mb-3">
-                            <input type="date" name="fechaInicio"
+                            <input type="date" th:field="*{fechaInicio}"
                                    class="form-control text-box"
-                                   placeholder="Fecha Inicio" required/>
+                                   placeholder="Fecha Inicio"/>
+
+                            <p th:if="${#fields.hasErrors('fechaInicio')}"
+                               th:errorclass="formFieldError"
+                               class="text-danger"
+                               th:errors="*{fechaInicio}"/></p>
                         </div>
+
                         <div class="form-group mb-3">
-                            <input type="number" name="alumnosMin"
+                            <input type="number" th:field="*{alumnosMin}"
                                    class="form-control text-box"
-                                   placeholder="Mínimo Alumnos" required/>
+                                   placeholder="Mínimo Alumnos"/>
+
+                            <p th:if="${#fields.hasErrors('alumnosMin')}"
+                               th:errorclass="formFieldError"
+                               class="text-danger"
+                               th:errors="*{alumnosMin}"/></p>
                         </div>
+
                         <div class="form-group mb-3">
-                            <select name="estado" class="form-select" required>
+                            <select th:field="*{estado}" class="form-select" required>
                                 <option value="0">CREADO</option>
                                 <option value="1">EN PROCESO DE VENTA</option>
                                 <option value="2">COMPLETO</option>
@@ -163,13 +183,19 @@
                 <td class="text-end" th:text="${curso.alumnosAct}"></td>
                 <td class="text-end">
                     <span th:if="${curso.estado == 0}" class="status-badge status-creado">CREADO</span>
-                    <span th:if="${curso.estado == 1}" class="status-badge status-en-venta">EN PROCESO DE VENTA</span>
-                    <span th:if="${curso.estado == 2}" class="status-badge status-completo">COMPLETO</span>
+                    <span th:if="${curso.estado == 1}"
+                          class="status-badge status-en-venta">EN PROCESO DE VENTA</span>
+                    <span th:if="${curso.estado == 2}"
+                          class="status-badge status-completo">COMPLETO</span>
                 </td>
                 <td class="text-end">
                     <a href="#" class="text-primary me-4"><i class="fas fa-edit"></i></a>
-                    <a th:href="@{|cursoEliminar?codigo=| + ${curso.idCurso}}"
-                       class="text-danger">
+                    <!--                    <a th:href="@{|cursoEliminar?codigo=| + ${curso.idCurso}}"-->
+                    <!--                       class="text-danger">-->
+                    <!--                        <i class="fas fa-trash-alt"></i>-->
+                    <!--                    </a>-->
+                    <a th:attr="onclick = ${ 'modalEliminar(' + curso.idCurso + ','''+curso.nomCurso+''')' }"
+                       href="#" class="text-danger">
                         <i class="fas fa-trash-alt"></i>
                     </a>
                 </td>
@@ -177,7 +203,40 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Inicio del Popup de eliminación -->
+    <div class="modal modal-warning fade in" th:id="deleteModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Eliminar Curso</h5>
+                </div>
+                <div class="modal-body">
+                    <h3 id="msgEliminar"></h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left"
+                            data-dismiss="modal">
+                        No
+                    </button>
+                    <a type="button" class="btn btn-outline" id="btnEliminar"><i
+                            class="fa fa-check"></i>&nbsp;SI</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
+
+<script>
+    function modalEliminar(id, nombre) {
+        $("#msgEliminar").text("Seguro de eliminar el curso " + nombre + "?");
+        $('#btnEliminar').on("click", function () {
+            window.location = "/cursoEliminar?codigo=" + id;
+        });
+        $("#deleteModal").modal("show");
+    };
+</script>
 
 <script th:src="@{/js/bootstrap.min.js}" type="text/javascript"></script>
 <!-- Font Awesome -->
